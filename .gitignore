@@ -1,0 +1,45 @@
+# Exclude everything
+/*
+
+# Specific includes
+
+## Include Build System/Scripts
+!NuGet.Config
+!Directory.Build.props
+!build.sh
+!build.ps1
+!build.cmd
+
+## Include Markdowns
+!*.md
+!LICENSE
+
+## Include important Git files
+!.gitmodules
+!.gitignore
+!.gitattributes
+!.git-blame-ignore-revs
+
+## Include GitHub specific
+!.github/
+
+## Include Assets
+!assets/
+
+## Include Thunderstore metadata
+!thunderstore.toml
+
+## Thunderstore Assets
+!Thunderstore
+FeralMinimap.dll
+
+## Include Solution
+!FeralMinimap.sln
+
+### FeralMinimap Project
+!FeralMinimap/
+FeralMinimap/[Bb]in/
+FeralMinimap/[Oo]bj/
+
+# Include Explicit exceptions/ignores
+**.user

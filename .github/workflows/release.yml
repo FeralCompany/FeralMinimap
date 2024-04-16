@@ -1,0 +1,136 @@
+name: Create Release
+on:
+  push:
+    tags: [ '*' ]
+jobs:
+  build-release-artifact:
+    name: Build Release Artifact
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    env:
+      RELEASE_VERSION: ${{ github.ref_name }}
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          filter: tree:0
+      - name: Restore Solution
+        run: |
+          dotnet restore
+      - name: Install Thunderstore CLI
+        run: |
+          dotnet tool install -g tcli
+      - name: Pack Solution
+        run: |
+          dotnet pack
+      - name: Upload Thunderstore Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: thunderstore-build
+          path: dist/*.zip
+  create-release:
+    name: Create Release
+    needs: build-release-artifact
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    env:
+      RELEASE_VERSION: ${{ github.ref_name }}
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          filter: tree:0
+      - name: Delete Old Release
+        run: |
+          gh release delete --yes "${RELEASE_VERSION}"
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release Current Tag
+        shell: bash
+        continue-on-error: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST_VERSION=$(grep -oP '(?<=Version \[).*(?=\])' CHANGELOG.md | head -n 1)
+          START_LINE=$(grep -n "Version \[$LATEST_VERSION\]" CHANGELOG.md | cut -d ":" -f 1)
+          NEXT_RELEASE_LINE=$(grep -n "Version \[v" CHANGELOG.md | grep -A 1 "$LATEST_VERSION" | tail -n 1 | cut -d ":" -f 1)
+
+          export "CHANGELOG_FILE=$(mktemp --suffix=.md)"
+          echo "CHANGELOG_FILE=${CHANGELOG_FILE}" >> $GITHUB_ENV
+
+          gh api --method POST -H "Accept: application/vnd.github+json" \
+            "/repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+            -f tag_name="${RELEASE_VERSION}" \
+            --jq ".body" > "${CHANGELOG_FILE}"
+
+          if [ -z "$NEXT_RELEASE_LINE" ]; then
+            end_line=$(wc -l < CHANGELOG.md)
+          else
+              end_line=$((NEXT_RELEASE_LINE - 1))
+          fi
+
+          echo "" >> "${CHANGELOG_FILE}"
+          sed -n "${START_LINE},${end_line}p" CHANGELOG.md >> "${CHANGELOG_FILE}"
+          cat "${CHANGELOG_FILE}"
+
+          gh release create "${RELEASE_VERSION}" -t "${RELEASE_VERSION}" -F "${CHANGELOG_FILE}"
+  upload-release-artifacts:
+    name: Upload Release Artifacts
+    needs: create-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          filter: tree:0
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+      - name: Upload artifacts to Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.ref_name }} thunderstore-build/*.zip
+  deploy-thunderstore:
+    name: Deploy Thunderstore Release
+    needs: build-release-artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          filter: tree:0
+      - name: Download Thunderstore Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: thunderstore-build
+          path: ./dist
+      - name: Validate Artifact
+        run: test -d ./dist
+      - name: Setup .NET environment
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.100"
+      - name: Install Thunderstore CLI
+        run: |
+          dotnet tool install -g tcli
+      - name: Publish to Thunderstore
+        env:
+          TCLI_AUTH_TOKEN: ${{ secrets.THUNDERSTORE_API_TOKEN }}
+        run: |
+          tcli publish --config-path ./assets/thunderstore.toml --file dist/*.zip

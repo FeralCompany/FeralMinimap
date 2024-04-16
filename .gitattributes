@@ -1,0 +1,12 @@
+# Plain text files
+* text=auto
+LICENSE text
+*.cs text
+*.md text
+*.sln text
+*.csproj text
+*.toml text
+*.yml text
+
+# Binary files
+*.png binary
