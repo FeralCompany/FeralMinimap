@@ -145,7 +145,7 @@ public class DetachedMinimap : MonoBehaviour
         _cameraViewText = DestroyObject(_cameraViewText);
     }
 
-    private T? DestroyObject<T>(T obj) where T : Object
+    private static T? DestroyObject<T>(T obj) where T : Object
     {
         Destroy(obj);
         return null;
@@ -218,7 +218,7 @@ public class DetachedMinimap : MonoBehaviour
             return;
         }
 
-        if (_targetPlayer.isPlayerControlled) return;
+        if (_targetPlayer.isPlayerControlled || _targetPlayer.isPlayerDead) return;
 
         if (_targetIndex + 1 >= targets.Count)
             _targetIndex = 0;

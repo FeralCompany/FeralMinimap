@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nothing yet.
 
+## Version [v0.0.3] (2024-04-21)
+
+### Fixes
+
+- Fix a bug where you could not view the camera of a dead player
+- Also fix an recursive issue when all players died.
+
 ## Version [v0.0.2] (2024-04-21)
 
 ### Fixes
