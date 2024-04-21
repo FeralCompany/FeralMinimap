@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nothing yet.
 
+## Version [v0.0.2] (2024-04-21)
+
+### Fixes
+
+- A (bad) lifecycle fix, where exiting and re-entering a lobby would cause the mod to stop working.
+  - A better fix is in the works, but this should be a good band-aid for now.
+
 ## Version [v0.0.1] (2024-04-21)
 
 ### Added

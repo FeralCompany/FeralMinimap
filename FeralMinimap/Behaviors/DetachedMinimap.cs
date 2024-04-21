@@ -14,11 +14,11 @@ public class DetachedMinimap : MonoBehaviour
     private const float MaxFontSize = 100F;
     private const float MinFontSize = 1F;
 
-    private Camera _camera = null!;
-    private Light _cameraLight = null!;
+    private Camera? _camera;
+    private Light? _cameraLight;
 
-    private RawImage _cameraView = null!;
-    private TextMeshProUGUI _cameraViewText = null!;
+    private RawImage? _cameraView;
+    private TextMeshProUGUI? _cameraViewText;
 
     private int _targetIndex;
     private PlayerControllerB? _targetPlayer;
@@ -30,13 +30,10 @@ public class DetachedMinimap : MonoBehaviour
 
     private static List<TransformAndName>? PotentialTargets => StartOfRound.Instance?.mapScreen?.radarTargets;
 
-    private void Awake()
-    {
-        StartCoroutine(InitCamera());
-    }
-
     private void Update()
     {
+        ValidateCameraLifecycle();
+
         if (!_camera) return;
 
         RepositionComponents();
@@ -89,12 +86,8 @@ public class DetachedMinimap : MonoBehaviour
             MoveCameraTo(_targetTransform.transform.position);
     }
 
-    private IEnumerator InitCamera()
+    private void InitCamera()
     {
-        yield return new WaitUntil(() => StartOfRound.Instance
-                                         && StartOfRound.Instance.mapScreen
-                                         && StartOfRound.Instance.mapScreen.mapCamera);
-
         _camera = Instantiate(StartOfRound.Instance.mapScreen.mapCamera, gameObject.transform);
         _camera.targetTexture = new RenderTexture(455, 315, 32, GraphicsFormat.R8G8B8A8_UNorm)
         {
@@ -142,6 +135,37 @@ public class DetachedMinimap : MonoBehaviour
         _cameraViewText.rectTransform.anchorMax = new Vector2(0, 1);
 
         Buttons.SwitchTarget.OnPressed(SwitchNextTarget);
+    }
+
+    private void DestroyCamera()
+    {
+        _camera = DestroyObject(_camera);
+        _cameraLight = DestroyObject(_cameraLight);
+        _cameraView = DestroyObject(_cameraView);
+        _cameraViewText = DestroyObject(_cameraViewText);
+    }
+
+    private T? DestroyObject<T>(T obj) where T : Object
+    {
+        Destroy(obj);
+        return null;
+    }
+
+    private void ValidateCameraLifecycle()
+    {
+        if (StartOfRound.Instance && StartOfRound.Instance.mapScreen && StartOfRound.Instance.mapScreen.mapCamera)
+        {
+            if (_camera)
+            {
+                return;
+            }
+
+            InitCamera();
+        }
+        else
+        {
+            DestroyCamera();
+        }
     }
 
     private void RepositionComponents()
