@@ -3,7 +3,7 @@ using HarmonyLib;
 namespace FeralMinimap.Patches;
 
 [HarmonyPatch(typeof(RadarBoosterItem))]
-public static class RadarBoosterPatches
+public static class RadarBoosterPatch
 {
     [HarmonyPostfix]
     [HarmonyPatch(nameof(RadarBoosterItem.Update))]

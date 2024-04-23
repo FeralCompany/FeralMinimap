@@ -1,8 +1,6 @@
+using System.Reflection;
 using BepInEx;
 using FeralCommon;
-using FeralCommon.Utils;
-using FeralMinimap.Behaviors;
-using FeralMinimap.Patches;
 using LethalCompanyInputUtils.Api;
 
 namespace FeralMinimap;
@@ -19,10 +17,9 @@ public class FeralMinimapPlugin : FeralPlugin
         var binder = new BinderWorkAround(this);
         CompleteWorkAroundPartTwo(binder);
 
-        var feralMinimapAnchor = UnityTool.CreateRootGameObject("FeralMinimapAnchor");
-        feralMinimapAnchor.AddComponent<DetachedMinimap>();
-
-        Harmony.PatchAll(typeof(RadarBoosterPatches));
+        foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
+            if (type.Namespace != null && type.Namespace.StartsWith("FeralMinimap.Patches"))
+                Harmony.PatchAll(type);
     }
 
     private class BinderWorkAround(FeralPlugin plugin) : LcInputActions
