@@ -6,7 +6,7 @@ using UnityEngine;
 namespace FeralMinimap.Patches;
 
 [HarmonyPatch(typeof(ManualCameraRenderer))]
-internal static class ManualCameraRendererPatch
+public static class ManualCameraRendererPatch
 {
     [HarmonyPostfix]
     [HarmonyPatch("Update")]
