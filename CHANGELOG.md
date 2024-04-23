@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Nothing, yet.
+### Changed
+
+- Updated FeralCommon to `v0.1.3`
 
 ## Version [v0.0.5] (2024-04-23)
 

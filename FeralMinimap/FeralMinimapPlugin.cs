@@ -1,6 +1,7 @@
 using System.Reflection;
 using BepInEx;
 using FeralCommon;
+using FeralCommon.Utils.Extensions;
 using LethalCompanyInputUtils.Api;
 
 namespace FeralMinimap;
@@ -17,9 +18,7 @@ public class FeralMinimapPlugin : FeralPlugin
         var binder = new BinderWorkAround(this);
         CompleteWorkAroundPartTwo(binder);
 
-        foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
-            if (type.Namespace != null && type.Namespace.StartsWith("FeralMinimap.Patches"))
-                Harmony.PatchAll(type);
+        Harmony.PatchNamespace("FeralMinimap.Patches");
     }
 
     private class BinderWorkAround(FeralPlugin plugin) : LcInputActions
