@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Nothing, yet.
+### Added
+
+- Added a new config option to determine the camera's zoom level. Request [#2](https://github.com/FeralCompany/FeralMinimap/issues/2).
+
+### Changed
+
+- "North" is kind of whatever you want it to be, but I've decided to adopt GeneralImprovement's definition of "North" being 90 degrees.
+  - I'm not sure what their logic was behind the decision, but I trust that Shaosil has a good reason for it.
 
 ## Version [v0.0.6] (2024-04-23)
 

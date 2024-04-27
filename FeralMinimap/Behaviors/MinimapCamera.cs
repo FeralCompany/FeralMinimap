@@ -26,6 +26,8 @@ public class MinimapCamera : MonoBehaviour
         Camera.aspect = 1.444444F;
         Camera.pixelRect = new Rect(0, 0, 455, 315);
         Camera.rect = new Rect(0, 0, 1, 1);
+        Camera.orthographic = true;
+        Camera.orthographicSize = Config.Minimap.Zoom;
 
         CameraData = gameObject.GetComponent<HDAdditionalCameraData>();
         CameraData.name = "FeralMinimapCameraData";
@@ -60,6 +62,7 @@ public class MinimapCamera : MonoBehaviour
         Camera.transform.eulerAngles = new Vector3(90F, GetEulerY(), 0F);
         Camera.transform.position = Target.Position;
         Camera.nearClipPlane = Target.NearClipPlane;
+        Camera.orthographicSize = Config.Minimap.Zoom;
 
         Light.intensity = Config.Minimap.InsideBrightness;
         Light.enabled = Target.RequiresLighting;
@@ -72,10 +75,10 @@ public class MinimapCamera : MonoBehaviour
         {
             RotationStrategy.Default => 315F,
             RotationStrategy.Target => Target.EulerY,
-            RotationStrategy.North => 0F,
-            RotationStrategy.East => 90F,
-            RotationStrategy.South => 180F,
-            RotationStrategy.West => 270F,
+            RotationStrategy.North => 90F,
+            RotationStrategy.East => 180F,
+            RotationStrategy.South => 270F,
+            RotationStrategy.West => 0F,
             _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, $"Invalid rotation strategy: {strategy}")
         };
     }

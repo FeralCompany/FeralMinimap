@@ -29,19 +29,30 @@ public static class Config
             .WithDefaultValue(200)
             .NoSlider();
 
+        public static readonly FloatConfig Zoom = new FloatConfig("Minimap", "Zoom")
+            .WithDescription("""
+                             Determines the 'orthographic size' of the minimap camera. Otherwise known as the zoom level.
+                             Larger values will zoom the map out, showing more of the facility or surrounding area.
+                             """
+            )
+            .WithMin(1F)
+            .WithMax(100F)
+            .WithDefaultValue(19.7F)
+            .WithStep(0.1F);
+
         public static readonly IntConfig XPosOffset = new IntConfig("Minimap", "X Position Offset")
             .WithDescription("""
                              The horizontal offset of the minimap from the right side of the screen.
-
-                             0 represents being flush with the right side of the screen. Positive values move the minimap to the left.
+                             0 represents being flush with the right side of the screen.
+                             Positive values move the minimap to the left.
                              """
             );
 
         public static readonly IntConfig YPosOffset = new IntConfig("Minimap", "Y Position Offset")
             .WithDescription("""
                              The vertical offset of the minimap from the top of the screen.
-
-                             0 represents being flush with the top of the screen. Positive values move the minimap down.
+                             0 represents being flush with the top of the screen.
+                             Positive values move the minimap down.
                              """
             );
 
@@ -61,10 +72,8 @@ public static class Config
         public static readonly BoolConfig AlwaysShowRadarBoosters = new BoolConfig("Fixes", "Always Show Radar Boosters")
             .WithDescription("""
                              Always show radar boosters on the minimap, even when they're not active.
-
                              The default behavior is to only show radar boosters on the minimap when they're active or when they have never been
                              activated (because they're visible by default).
-
                              Enabling this option will make radar boosters always visible on the minimap, regardless of their state.
                              """)
             .WithDefaultValue(true);
