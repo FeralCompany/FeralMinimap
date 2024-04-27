@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Nothing, yet.
+
+## Version [v0.0.7] (2024-04-23)
+
 ### Added
 
 - Added a new config option to determine the camera's zoom level. Request [#2](https://github.com/FeralCompany/FeralMinimap/issues/2).
