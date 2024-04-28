@@ -23,14 +23,11 @@ public class MinimapCamera : MonoBehaviour
         Camera = gameObject.GetComponent<Camera>();
         Camera.name = "FeralMinimapCamera";
         Camera.cullingMask += Mask.Unused1;
-        Camera.aspect = 1.444444F;
-        Camera.pixelRect = new Rect(0, 0, 455, 315);
-        Camera.rect = new Rect(0, 0, 1, 1);
+        Camera.aspect = Config.Minimap.AspectRatio;
         Camera.orthographic = true;
         Camera.orthographicSize = Config.Minimap.Zoom;
 
         CameraData = gameObject.GetComponent<HDAdditionalCameraData>();
-        CameraData.name = "FeralMinimapCameraData";
 
         Light = gameObject.AddComponent<Light>();
         Light.type = LightType.Directional;
@@ -49,6 +46,10 @@ public class MinimapCamera : MonoBehaviour
     {
         Config.Minimap.InsideBrightness.OnValueChanged(newValue => Light.intensity = newValue);
 
+        Config.Minimap.Zoom.OnValueChanged(_ => UpdateCameraSize());
+        Config.Minimap.AspectRatio.OnValueChanged(_ => UpdateCameraSize());
+        Config.Minimap.Size.OnValueChanged(_ => UpdateCameraSize());
+
         Camera.targetTexture = MinimapView.Instance.Feed;
 
         MinimapView.Instance.Text.font = StartOfRound.Instance.mapScreenPlayerName.font;
@@ -58,14 +59,20 @@ public class MinimapCamera : MonoBehaviour
 
     private void Update()
     {
-        GetEulerY();
         Camera.transform.eulerAngles = new Vector3(90F, GetEulerY(), 0F);
         Camera.transform.position = Target.Position;
         Camera.nearClipPlane = Target.NearClipPlane;
-        Camera.orthographicSize = Config.Minimap.Zoom;
 
         Light.intensity = Config.Minimap.InsideBrightness;
         Light.enabled = Target.RequiresLighting;
+    }
+
+    private void UpdateCameraSize()
+    {
+        Camera.orthographicSize = Config.Minimap.Zoom;
+        Camera.aspect = Config.Minimap.AspectRatio;
+        Camera.pixelRect = new Rect(0, 0, Config.Minimap.Width, Config.Minimap.Height);
+        Camera.rect = new Rect(0, 0, 1, 1);
     }
 
     private float GetEulerY()

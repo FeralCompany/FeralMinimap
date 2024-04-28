@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Nothing, yet.
+### Added
+
+- Added option to configure Aspect Ratio of the map.
+- Added option to configure RenderDepth of the view. Higher values will increase the quality of the view, but may cause performance issues.
+
+### Changed
+
+- Lowered minimum font size for `MinimapView`
 
 ## Version [v0.0.7] (2024-04-23)
 
@@ -18,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - "North" is kind of whatever you want it to be, but I've decided to adopt GeneralImprovement's definition of "North" being 90 degrees.
-  - I'm not sure what their logic was behind the decision, but I trust that Shaosil has a good reason for it.
+    - I'm not sure what their logic was behind the decision, but I trust that Shaosil has a good reason for it.
 
 ## Version [v0.0.6] (2024-04-23)
 

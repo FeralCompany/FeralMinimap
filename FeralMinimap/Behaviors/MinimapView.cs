@@ -28,9 +28,10 @@ public class MinimapView : MonoBehaviour
         Image.rectTransform.anchoredPosition =
             new Vector2(Config.Minimap.XPosOffset * -1, Config.Minimap.YPosOffset * -1 + MagicNumbers.MinimapYPosPadding);
 
-        Feed = new RenderTexture(Config.Minimap.Width, Config.Minimap.Height, 32, GraphicsFormat.R8G8B8A8_UNorm)
+        Feed = new RenderTexture(Config.Minimap.Width, Config.Minimap.Height, (int)Config.Minimap.RenderTextureDepth.Value,
+            GraphicsFormat.R8G8B8A8_UNorm)
         {
-            isPowerOfTwo = false,
+            isPowerOfTwo = true,
             filterMode = FilterMode.Point,
             anisoLevel = 0
         };
@@ -46,7 +47,7 @@ public class MinimapView : MonoBehaviour
 
         Text.text = "Initializing FeralMinimap...";
         Text.fontSizeMax = 50F;
-        Text.fontSizeMin = 10F;
+        Text.fontSizeMin = 5F;
         Text.enableWordWrapping = false;
         Text.enableAutoSizing = true;
 
@@ -58,13 +59,10 @@ public class MinimapView : MonoBehaviour
             AdjustTooltips();
         });
 
-        Config.Minimap.Size.OnValueChanged(_ =>
-        {
-            Image.rectTransform.sizeDelta = new Vector2(Config.Minimap.Width, Config.Minimap.Height);
-            Feed.height = Config.Minimap.Height;
-            Feed.width = Config.Minimap.Width;
-            AdjustTooltips();
-        });
+        Config.Minimap.Size.OnValueChanged(_ => UpdateViewSize());
+        Config.Minimap.AspectRatio.OnValueChanged(_ => UpdateViewSize());
+
+        Config.Minimap.RenderTextureDepth.OnValueChanged(newValue => Feed.depth = (int)newValue);
 
         Config.Minimap.XPosOffset.OnValueChanged(newValue =>
         {
@@ -84,6 +82,14 @@ public class MinimapView : MonoBehaviour
     private void Update()
     {
         Text.text = MinimapCamera.Instance.Target.Name;
+    }
+
+    private void UpdateViewSize()
+    {
+        Image.rectTransform.sizeDelta = new Vector2(Config.Minimap.Width, Config.Minimap.Height);
+        Feed.height = Config.Minimap.Height;
+        Feed.width = Config.Minimap.Width;
+        AdjustTooltips();
     }
 
     private static void AdjustTooltips()
