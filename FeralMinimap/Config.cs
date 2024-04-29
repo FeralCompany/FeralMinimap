@@ -1,10 +1,67 @@
 using FeralCommon.Config;
+using FeralMinimap.Behaviors;
 using FeralMinimap.Util;
+using UnityEngine;
 
 namespace FeralMinimap;
 
 public static class Config
 {
+    internal static void InitController()
+    {
+        Minimap.Size.OnValueChanged(_ =>
+        {
+            if (MinimapView.Instance) MinimapView.Instance.UpdateViewSize();
+        });
+
+        Minimap.AspectRatio.OnValueChanged(_ =>
+        {
+            if (MinimapView.Instance) MinimapView.Instance.UpdateViewSize();
+        });
+
+        Minimap.CameraFeedQuality.OnValueChanged(_ =>
+        {
+            if (MinimapView.Instance) MinimapView.Instance.UpdateFeedSize();
+        });
+
+        Minimap.XPosOffset.OnValueChanged(newValue =>
+        {
+            if (MinimapView.Instance)
+            {
+                var current = MinimapView.Instance.Image.rectTransform.anchoredPosition;
+                MinimapView.Instance.Image.rectTransform.anchoredPosition = new Vector2(newValue * -1, current.y);
+                MinimapView.AdjustTooltips();
+            }
+        });
+
+        Minimap.YPosOffset.OnValueChanged(newValue =>
+        {
+            if (MinimapView.Instance)
+            {
+                var current = MinimapView.Instance.Image.rectTransform.anchoredPosition;
+                MinimapView.Instance.Image.rectTransform.anchoredPosition = new Vector2(current.x, newValue * -1 + MagicNumbers.MinimapYPosPadding);
+                MinimapView.AdjustTooltips();
+            }
+        });
+
+        Minimap.InsideBrightness.OnValueChanged(newValue => MinimapCamera.Instance.Light.intensity = newValue);
+
+        Minimap.Zoom.OnValueChanged(_ =>
+        {
+            if (MinimapCamera.Instance) MinimapCamera.Instance.UpdateCameraSize();
+        });
+
+        Minimap.AspectRatio.OnValueChanged(_ =>
+        {
+            if (MinimapCamera.Instance) MinimapCamera.Instance.UpdateCameraSize();
+        });
+
+        Minimap.Size.OnValueChanged(_ =>
+        {
+            if (MinimapCamera.Instance) MinimapCamera.Instance.UpdateCameraSize();
+        });
+    }
+
     public static class Minimap
     {
         public static readonly IntConfig InsideBrightness = new IntConfig("Minimap", "Facility Brightness")
@@ -54,13 +111,13 @@ public static class Config
             .WithDefaultValue(19.7F)
             .WithStep(0.1F);
 
-        public static readonly EnumConfig<RenderDepth> RenderTextureDepth = new EnumConfig<RenderDepth>("Minimap", "Render Texture Depth")
-            .WithDescription("""
-                             The bit depth of the render texture used for the minimap.
-                             Increasing this value will increase the quality of the minimap, but may impact performance.
-                             """
-            )
-            .WithDefaultValue(RenderDepth.High);
+        public static readonly FloatConfig CameraFeedQuality = new FloatConfig("Minimap", "Camera Feed Quality")
+            .WithDescription(
+                "Multiplier for the size of the camera feed. Increasing this value will increase the size of the camera feed, which will increase the quality of the minimap.")
+            .WithMin(0.25F)
+            .WithMax(25F)
+            .WithDefaultValue(1F)
+            .WithStep(0.1F);
 
         public static readonly IntConfig XPosOffset = new IntConfig("Minimap", "X Position Offset")
             .WithDescription("""

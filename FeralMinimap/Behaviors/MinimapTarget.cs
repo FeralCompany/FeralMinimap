@@ -12,6 +12,7 @@ public class MinimapTarget : MonoBehaviour
     private RadarBoosterItem? _radar;
 
     private TransformAndName? _target;
+    public static MinimapTarget Instance { get; private set; } = null!;
     public string Name { get; private set; } = string.Empty;
     public Vector3 Position { get; private set; } = Vector3.zero;
     public float EulerY { get; private set; } = MagicNumbers.DefaultMinimapEulerY;
@@ -22,6 +23,7 @@ public class MinimapTarget : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
         Buttons.SwitchTarget.OnPressed(SwitchNextTarget);
     }
 
@@ -31,6 +33,11 @@ public class MinimapTarget : MonoBehaviour
 
         if (ValidateIndex())
             FetchData();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance) Destroy(Instance);
     }
 
     private bool ValidateIndex()
@@ -81,7 +88,7 @@ public class MinimapTarget : MonoBehaviour
         return player && (player.isPlayerDead || player.isPlayerControlled);
     }
 
-    private void SwitchNextTarget()
+    internal void SwitchNextTarget()
     {
         if (_index < 0 || _index + 1 >= PotentialTargets.Count)
         {
@@ -102,7 +109,7 @@ public class MinimapTarget : MonoBehaviour
 
         if (_player)
         {
-            Name = $"Player: {_target.name}";
+            Name = $"ThisIsPlayerHowAboutThat: {_target.name}";
             if (_player!.isInHangarShipRoom) NearClipPlane = MagicNumbers.HangerShipNearClipPlane;
 
             if (_player.isInsideFactory) RequiresLighting = true;

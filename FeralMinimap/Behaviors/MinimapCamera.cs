@@ -17,7 +17,6 @@ public class MinimapCamera : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance) Destroy(Instance);
         Instance = this;
 
         Camera = gameObject.GetComponent<Camera>();
@@ -44,12 +43,6 @@ public class MinimapCamera : MonoBehaviour
 
     private void Start()
     {
-        Config.Minimap.InsideBrightness.OnValueChanged(newValue => Light.intensity = newValue);
-
-        Config.Minimap.Zoom.OnValueChanged(_ => UpdateCameraSize());
-        Config.Minimap.AspectRatio.OnValueChanged(_ => UpdateCameraSize());
-        Config.Minimap.Size.OnValueChanged(_ => UpdateCameraSize());
-
         Camera.targetTexture = MinimapView.Instance.Feed;
 
         MinimapView.Instance.Text.font = StartOfRound.Instance.mapScreenPlayerName.font;
@@ -67,7 +60,16 @@ public class MinimapCamera : MonoBehaviour
         Light.enabled = Target.RequiresLighting;
     }
 
-    private void UpdateCameraSize()
+    private void OnDestroy()
+    {
+        if (Camera) Destroy(Camera);
+        if (CameraData) Destroy(CameraData);
+        if (Light) Destroy(Light);
+        if (Target) Destroy(Target);
+        if (Instance) Destroy(Instance);
+    }
+
+    internal void UpdateCameraSize()
     {
         Camera.orthographicSize = Config.Minimap.Zoom;
         Camera.aspect = Config.Minimap.AspectRatio;

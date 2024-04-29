@@ -18,6 +18,9 @@ public class FeralMinimapPlugin : FeralPlugin
         CompleteWorkAroundPartTwo(binder);
 
         Harmony.PatchNamespace("FeralMinimap.Patches");
+
+        Buttons.InitController();
+        FeralMinimap.Config.InitController();
     }
 
     private class BinderWorkAround(FeralPlugin plugin) : LcInputActions

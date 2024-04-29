@@ -17,7 +17,6 @@ public class MinimapView : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance) Destroy(Instance);
         Instance = this;
 
         Image = gameObject.AddComponent<RawImage>();
@@ -28,55 +27,23 @@ public class MinimapView : MonoBehaviour
         Image.rectTransform.anchoredPosition =
             new Vector2(Config.Minimap.XPosOffset * -1, Config.Minimap.YPosOffset * -1 + MagicNumbers.MinimapYPosPadding);
 
-        Feed = new RenderTexture(Config.Minimap.Width, Config.Minimap.Height, (int)Config.Minimap.RenderTextureDepth.Value,
-            GraphicsFormat.R8G8B8A8_UNorm)
-        {
-            isPowerOfTwo = true,
-            filterMode = FilterMode.Point,
-            anisoLevel = 0
-        };
-
-        Image.texture = Feed;
+        UpdateFeedSize();
 
         Text = new GameObject("FeralMinimapText").AddComponent<TextMeshProUGUI>();
         Text.transform.SetParent(Image.rectTransform, false);
         Text.rectTransform.pivot = new Vector2(0, 1);
         Text.rectTransform.anchorMin = new Vector2(0, 1);
         Text.rectTransform.anchorMax = new Vector2(0, 1);
-        Text.rectTransform.anchoredPosition = new Vector2(5, -5);
+        Text.rectTransform.sizeDelta = new Vector2(Config.Minimap.Width, Config.Minimap.Height);
+        Text.rectTransform.anchoredPosition = new Vector2(0, 0);
 
         Text.text = "Initializing FeralMinimap...";
-        Text.fontSizeMax = 50F;
-        Text.fontSizeMin = 5F;
+        Text.fontSizeMax = 20F;
+        Text.fontSizeMin = 1F;
         Text.enableWordWrapping = false;
         Text.enableAutoSizing = true;
 
         AdjustTooltips();
-        Buttons.MinimapEnabled.OnToggle(newValue =>
-        {
-            Image.enabled = newValue;
-            Text.enabled = newValue;
-            AdjustTooltips();
-        });
-
-        Config.Minimap.Size.OnValueChanged(_ => UpdateViewSize());
-        Config.Minimap.AspectRatio.OnValueChanged(_ => UpdateViewSize());
-
-        Config.Minimap.RenderTextureDepth.OnValueChanged(newValue => Feed.depth = (int)newValue);
-
-        Config.Minimap.XPosOffset.OnValueChanged(newValue =>
-        {
-            var current = Image.rectTransform.anchoredPosition;
-            Image.rectTransform.anchoredPosition = new Vector2(newValue * -1, current.y);
-            AdjustTooltips();
-        });
-
-        Config.Minimap.YPosOffset.OnValueChanged(newValue =>
-        {
-            var current = Image.rectTransform.anchoredPosition;
-            Image.rectTransform.anchoredPosition = new Vector2(current.x, newValue * -1 + MagicNumbers.MinimapYPosPadding);
-            AdjustTooltips();
-        });
     }
 
     private void Update()
@@ -84,15 +51,43 @@ public class MinimapView : MonoBehaviour
         Text.text = MinimapCamera.Instance.Target.Name;
     }
 
-    private void UpdateViewSize()
+    private void OnDestroy()
+    {
+        if (Image) Destroy(Image);
+        if (Feed) Destroy(Feed);
+        if (Text) Destroy(Text);
+        if (Instance) Destroy(Instance);
+    }
+
+    internal void UpdateViewSize()
     {
         Image.rectTransform.sizeDelta = new Vector2(Config.Minimap.Width, Config.Minimap.Height);
-        Feed.height = Config.Minimap.Height;
-        Feed.width = Config.Minimap.Width;
+        Text.rectTransform.sizeDelta = new Vector2(Config.Minimap.Width, Config.Minimap.Height);
+
+        UpdateFeedSize();
+
         AdjustTooltips();
     }
 
-    private static void AdjustTooltips()
+    internal void UpdateFeedSize()
+    {
+        var oldFeed = Feed;
+        Feed = new RenderTexture((int)(Config.Minimap.Width * Config.Minimap.CameraFeedQuality),
+            (int)(Config.Minimap.Height * Config.Minimap.CameraFeedQuality), 32, GraphicsFormat.R8G8B8A8_UNorm)
+        {
+            isPowerOfTwo = true,
+            filterMode = FilterMode.Point,
+            anisoLevel = 0
+        };
+
+        Image.texture = Feed;
+        if (MinimapCamera.Instance && MinimapCamera.Instance.Camera)
+            MinimapCamera.Instance.Camera.targetTexture = Feed;
+
+        Destroy(oldFeed);
+    }
+
+    internal static void AdjustTooltips()
     {
         if (Buttons.MinimapEnabled)
         {

@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Nothing, yet.
+### Added
+
+- Added `Feed Quality` as a config option, allowing you to increase the size of the minimap feed, at the cost of performance.
+  - Note: I have not noticed significant performance impact, but it likely depends on your system.
+
+### Changes
+
+- Lower maximum font size for `MinimapView` to 20.
+- Removed render depth option. It was better replaced by the new Feed Quality option.
+
+### Fixes
+
+- Fixed some lifecycle issue, potential (often) re-registration of event handlers.
+- Minimap text now scales with the minimap size properly.
 
 ## Version [v0.0.8] (2024-04-28)
 
