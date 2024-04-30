@@ -24,7 +24,6 @@ public class MinimapTarget : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        Buttons.SwitchTarget.OnPressed(SwitchNextTarget);
     }
 
     private void Update()

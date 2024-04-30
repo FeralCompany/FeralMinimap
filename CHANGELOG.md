@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixes
 
 - Revert debug change to player label in `MinimapTarget`
+- Fix duplicate listen to `Buttons.SwitchTarget`
 
 ## Version [v0.0.9] (2024-04-29)
 
