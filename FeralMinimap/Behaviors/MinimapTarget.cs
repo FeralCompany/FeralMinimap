@@ -109,7 +109,7 @@ public class MinimapTarget : MonoBehaviour
 
         if (_player)
         {
-            Name = $"ThisIsPlayerHowAboutThat: {_target.name}";
+            Name = $"Player: {_target.name}";
             if (_player!.isInHangarShipRoom) NearClipPlane = MagicNumbers.HangerShipNearClipPlane;
 
             if (_player.isInsideFactory) RequiresLighting = true;

@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Nothing, yet.
+### Fixes
+
+- Revert debug change to player label in `MinimapTarget`
 
 ## Version [v0.0.9] (2024-04-29)
 
